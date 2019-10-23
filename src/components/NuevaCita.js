@@ -1,17 +1,19 @@
 import React, { Component } from "react";
 import uuid from "uuid";
 
+const stateInicial = {
+  cita: {
+    mascota: "",
+    propietario: "",
+    fecha: "",
+    hora: "",
+    sintomas: ""
+  },
+  error: false
+};
+
 class NuevaCita extends Component {
-  state = {
-    cita: {
-      mascota: "",
-      propietario: "",
-      fecha: "",
-      hora: "",
-      sintomas: ""
-    },
-    error: false
-  };
+  state = { ...stateInicial };
 
   handleChange = e => {
     console.log(e.target.name + ": " + e.target.value);
@@ -25,7 +27,6 @@ class NuevaCita extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-
     const { mascota, propietario, fecha, hora, sintomas } = this.state.cita;
 
     if (
@@ -33,22 +34,33 @@ class NuevaCita extends Component {
       propietario === "" ||
       fecha === "" ||
       hora === "" ||
-      sintomas
+      sintomas === ""
     ) {
-      const nuevaCita = { ...this.state.cita };
-      nuevaCita.id = uuid();
+      this.setState({ error: true });
 
-      this.props.crearNuevaCita(nuevaCita);
+      return;
     }
+    const nuevaCita = { ...this.state.cita };
+    nuevaCita.id = uuid();
+    this.props.crearNuevaCita(nuevaCita);
+    this.setState({ ...stateInicial });
   };
 
   render() {
+    const { error } = this.state;
+
     return (
       <div className="card mt-5 py-5">
         <div className="card-body">
           <h2 className="card-title text-center mb-5">
             Llena el formulario para crear una nueva cita
           </h2>
+
+          {error ? (
+            <div className="alert alert-danger mt-2 mb-5 text-center">
+              Diligencia el formulario para una nueva cita
+            </div>
+          ) : null}
 
           <form onSubmit={this.handleSubmit}>
             <div className="form-group row">
